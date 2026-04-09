@@ -13,6 +13,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.io.IOException;
 import java.util.Optional;
 
@@ -24,6 +26,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Autowired
     private UserRepository userRepository;
+
+    @Value("${app.frontend-url:http://localhost:3001}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -56,7 +61,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String token = jwtTokenProvider.generateToken(auth);
 
-        String redirectUrl = "http://localhost:3000/oauth2/redirect?token=" + token;
+        String redirectUrl = frontendUrl + "/oauth2/redirect?token=" + token;
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 }

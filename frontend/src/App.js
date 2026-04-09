@@ -1,7 +1,8 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './App.css';
 
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
@@ -20,9 +21,13 @@ const AdminMenuPage = React.lazy(() => import('./pages/AdminMenuPage'));
 const AdminReservationsPage = React.lazy(() => import('./pages/AdminReservationsPage'));
 const AdminReviewsPage = React.lazy(() => import('./pages/AdminReviewsPage'));
 const AdminAnalyticsPage = React.lazy(() => import('./pages/AdminAnalyticsPage'));
+const AdminQrPage = React.lazy(() => import('./pages/AdminQrPage'));
+const AdminBranchesPage = React.lazy(() => import('./pages/AdminBranchesPage'));
 const BranchPage = React.lazy(() => import('./pages/BranchPage'));
+const BranchesPage = React.lazy(() => import('./pages/BranchesPage'));
 const ReviewPage = React.lazy(() => import('./pages/ReviewPage'));
 const OAuth2Redirect = React.lazy(() => import('./pages/OAuth2Redirect'));
+const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage'));
 
 const Loading = () => (
   <div style={{ textAlign: 'center', padding: '3rem', color: '#4a2c2a' }}>
@@ -30,10 +35,13 @@ const Loading = () => (
   </div>
 );
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
+
   return (
-    <AuthProvider>
-      <Navbar />
+    <>
+      {!isAdminPage && <Navbar />}
       <ToastContainer position="top-right" autoClose={3000} />
       <React.Suspense fallback={<Loading />}>
         <Routes>
@@ -42,6 +50,7 @@ function App() {
           <Route path="/menu/:branchId" element={<MenuPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/branches" element={<BranchesPage />} />
           <Route path="/branch/:branchId" element={<BranchPage />} />
           <Route path="/oauth2/redirect" element={<OAuth2Redirect />} />
 
@@ -72,8 +81,25 @@ function App() {
           <Route path="/admin/analytics" element={
             <AdminRoute><AdminAnalyticsPage /></AdminRoute>
           } />
+          <Route path="/admin/qr" element={
+            <AdminRoute><AdminQrPage /></AdminRoute>
+          } />
+          <Route path="/admin/branches" element={
+            <AdminRoute><AdminBranchesPage /></AdminRoute>
+          } />
+
+          {/* 404 catch-all */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </React.Suspense>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
     </AuthProvider>
   );
 }

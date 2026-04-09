@@ -3,6 +3,15 @@ import { useParams } from 'react-router-dom';
 import api from '../api/axios';
 import Footer from '../components/Footer';
 
+const PLACEHOLDER_IMAGES = [
+  'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400&q=80',
+  'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80',
+  'https://images.unsplash.com/photo-1555507036-ab1f4038024a?w=400&q=80',
+  'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400&q=80',
+  'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80',
+  'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=400&q=80',
+];
+
 const MenuPage = () => {
   const { branchId } = useParams();
   const [categories, setCategories] = useState([]);
@@ -53,30 +62,64 @@ const MenuPage = () => {
   }, [branchId, selectedBranch]);
 
   const filteredItems = activeCategory
-    ? menuItems.filter((item) => item.categoryId === activeCategory)
+    ? menuItems.filter((item) => Number(item.categoryId) === Number(activeCategory))
     : menuItems;
 
-  return (
-    <div className="page-bg">
-      <div className="container">
-        {/* Header Section */}
-        <div className="section" style={{ textAlign: 'center' }}>
-          <h1 className="section-title">Artisan Menu</h1>
-          <p className="section-subtitle" style={{ margin: '0 auto' }}>
-            Sourced with integrity, roasted with precision, and served with a story in every cup.
-          </p>
-        </div>
+  const getPlaceholderImage = (index) => {
+    return PLACEHOLDER_IMAGES[index % PLACEHOLDER_IMAGES.length];
+  };
 
-        {/* Branch Selector */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #fde8d8 0%, #d4ecd6 33%, #f5deb3 66%, #fde8d8 100%)',
+      marginTop: 64,
+    }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 24px' }}>
+        {/* Header Section */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          paddingTop: '3rem',
+          paddingBottom: '1.5rem',
+          flexWrap: 'wrap',
+          gap: '1rem',
+        }}>
+          <div>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: 700, color: '#1c1917', margin: 0 }}>
+              Artisan Menu
+            </h1>
+            <p style={{
+              fontSize: '1.05rem',
+              color: '#7A6E64',
+              fontStyle: 'italic',
+              maxWidth: 540,
+              margin: '0.5rem 0 0',
+            }}>
+              "Sourced with integrity, roasted with precision, and served with a story in every cup."
+            </p>
+          </div>
+
+          {/* Branch Selector */}
           <select
-            className="form-select"
             value={selectedBranch}
             onChange={(e) => {
               setSelectedBranch(e.target.value);
               setActiveCategory(null);
             }}
-            style={{ maxWidth: '240px', borderRadius: '24px' }}
+            style={{
+              maxWidth: 240,
+              borderRadius: 9999,
+              border: '1.5px solid rgba(80, 69, 62, 0.2)',
+              padding: '0.5rem 2.5rem 0.5rem 1rem',
+              background: '#fff',
+              fontSize: '0.9rem',
+              color: '#1c1917',
+              outline: 'none',
+              cursor: 'pointer',
+              appearance: 'auto',
+            }}
           >
             <option value="">All Branches</option>
             {branches.map((b) => (
@@ -87,19 +130,44 @@ const MenuPage = () => {
           </select>
         </div>
 
-        {/* Category Filter Tabs */}
-        <div className="category-pills">
+        {/* Category Filter Pills */}
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          marginBottom: '2rem',
+        }}>
           <button
-            className={`category-pill${activeCategory === null ? ' category-pill-active' : ''}`}
             onClick={() => setActiveCategory(null)}
+            style={{
+              background: activeCategory === null ? '#1c1917' : '#f5f0eb',
+              color: activeCategory === null ? '#fff' : '#3D3028',
+              border: 'none',
+              borderRadius: 9999,
+              padding: '0.5rem 1.25rem',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
           >
             All
           </button>
           {categories.map((cat) => (
             <button
               key={cat.id}
-              className={`category-pill${activeCategory === cat.id ? ' category-pill-active' : ''}`}
               onClick={() => setActiveCategory(cat.id)}
+              style={{
+                background: activeCategory === cat.id ? '#1c1917' : '#f5f0eb',
+                color: activeCategory === cat.id ? '#fff' : '#3D3028',
+                border: 'none',
+                borderRadius: 9999,
+                padding: '0.5rem 1.25rem',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
             >
               {cat.name}
             </button>
@@ -108,56 +176,91 @@ const MenuPage = () => {
 
         {/* Menu Grid */}
         {loading ? (
-          <div className="loading">Loading menu...</div>
+          <div style={{ textAlign: 'center', padding: '4rem 0', color: '#78716c', fontSize: '1rem' }}>
+            Loading menu...
+          </div>
         ) : filteredItems.length === 0 ? (
-          <div className="empty-state">
+          <div style={{ textAlign: 'center', padding: '4rem 0', color: '#78716c', fontSize: '1rem' }}>
             <p>No items found in this category.</p>
           </div>
         ) : (
-          <div className="card-grid-3">
-            {filteredItems.map((item) => (
-              <div key={item.id} className="menu-card">
-                <div className="menu-card-img">
-                  {item.imageUrl ? (
-                    <img src={item.imageUrl} alt={item.name} />
-                  ) : (
-                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#bbb' }}>
-                      No Image
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '1.5rem',
+            paddingBottom: '2rem',
+          }}>
+            {filteredItems.map((item, index) => (
+              <div key={item.id} style={{
+                borderRadius: 24,
+                background: '#fff',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                overflow: 'hidden',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+              }}>
+                <div style={{ position: 'relative', width: '100%', height: 200, overflow: 'hidden' }}>
+                  <img
+                    src={item.imageUrl || getPlaceholderImage(index)}
+                    alt={item.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                  {item.discount > 0 && (
+                    <span style={{
+                      position: 'absolute',
+                      top: 12,
+                      right: 12,
+                      background: '#D94452',
+                      color: '#fff',
+                      padding: '0.25rem 0.7rem',
+                      borderRadius: 9999,
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                    }}>
+                      -{item.discount}%
                     </span>
                   )}
-                  {item.discount > 0 && (
-                    <span className="menu-card-badge-discount">-{item.discount}%</span>
-                  )}
                   {!item.available && (
-                    <div className="menu-card-badge-soldout">
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'rgba(0,0,0,0.45)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#fff',
+                      fontWeight: 700,
+                      fontSize: '1.1rem',
+                      letterSpacing: '0.5px',
+                    }}>
                       Sold Out
                     </div>
                   )}
                 </div>
-                <div className="menu-card-info">
-                  <div className="menu-card-name">{item.name}</div>
-                  <div className="menu-card-price">
-                    {item.discount > 0 ? (
-                      <>
-                        <span className="original">${item.price?.toFixed(2)}</span>
-                        <span className="discounted">
-                          ${(item.price * (1 - item.discount / 100)).toFixed(2)}
-                        </span>
-                      </>
+                <div style={{ padding: '1rem 1.25rem 1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                    <span style={{ fontWeight: 600, fontSize: '1rem', color: '#1c1917' }}>{item.name}</span>
+                    {item.available ? (
+                      <span style={{ fontSize: '1.15rem', fontWeight: 700, color: '#6F4E37' }}>
+                        {item.discount > 0 ? (
+                          <>
+                            <span style={{ textDecoration: 'line-through', color: '#A89E95', fontSize: '0.9rem', marginRight: '0.4rem' }}>
+                              ${item.price?.toFixed(2)}
+                            </span>
+                            <span>${(item.price * (1 - item.discount / 100)).toFixed(2)}</span>
+                          </>
+                        ) : (
+                          <span>${item.price?.toFixed(2)}</span>
+                        )}
+                      </span>
                     ) : (
-                      <span>${item.price?.toFixed(2)}</span>
+                      <span style={{ color: '#999', fontStyle: 'italic', fontSize: '0.9rem' }}>Unavailable</span>
                     )}
                   </div>
                   {item.description && (
-                    <p className="menu-card-desc">{item.description}</p>
+                    <p style={{ fontSize: '0.85rem', color: '#78716c', margin: '0.4rem 0 0', lineHeight: 1.5 }}>
+                      {item.description}
+                    </p>
                   )}
-                  <button
-                    className="btn-outline"
-                    disabled={!item.available}
-                    style={!item.available ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-                  >
-                    Add to Order
-                  </button>
                 </div>
               </div>
             ))}
@@ -165,9 +268,19 @@ const MenuPage = () => {
         )}
 
         {/* Promotional Banner */}
-        <div className="promo-banner">
-          <h3>The Morning Ritual</h3>
-          <p>Start every day with intention. Our signature morning blends are crafted to awaken your senses.</p>
+        <div style={{
+          background: 'linear-gradient(135deg, #2C1810, #6F4E37)',
+          borderRadius: 24,
+          padding: '2.5rem 2rem',
+          textAlign: 'center',
+          marginBottom: '3rem',
+        }}>
+          <h3 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: 700, margin: '0 0 0.5rem' }}>
+            The Morning Ritual
+          </h3>
+          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '1rem', margin: 0, maxWidth: 500, marginLeft: 'auto', marginRight: 'auto' }}>
+            Start every day with intention. Our signature morning blends are crafted to awaken your senses.
+          </p>
         </div>
       </div>
 

@@ -26,6 +26,29 @@ ChartJS.register(
   Legend
 );
 
+const labelStyle = {
+  display: 'block',
+  fontSize: '0.8rem',
+  fontWeight: 600,
+  color: '#78716c',
+  textTransform: 'uppercase',
+  letterSpacing: '0.5px',
+  marginBottom: '6px',
+};
+
+const inputStyle = {
+  width: '100%',
+  padding: '9px 14px',
+  fontSize: '0.9rem',
+  border: '1.5px solid #e7e5e4',
+  borderRadius: 10,
+  outline: 'none',
+  background: '#fff',
+  color: '#1c1917',
+  fontFamily: 'inherit',
+  boxSizing: 'border-box',
+};
+
 const AdminAnalyticsPage = () => {
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState('');
@@ -163,17 +186,33 @@ const AdminAnalyticsPage = () => {
 
   return (
     <AdminLayout activeItem="analytics">
-      <div className="admin-header">
-        <h1>Analytics & Insights</h1>
-        <p>Comprehensive performance data across all coffee lab locations.</p>
+      {/* Header */}
+      <div style={{ marginBottom: '24px' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1c1917', margin: 0 }}>
+          Analytics & Insights
+        </h1>
+        <p style={{ fontSize: '15px', color: '#78716c', margin: '6px 0 0 0' }}>
+          Comprehensive performance data across all coffee lab locations.
+        </p>
       </div>
 
       {/* Controls Row */}
-      <div className="admin-controls-row">
-        <div className="form-group">
-          <label>Branch</label>
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: '16px',
+        flexWrap: 'wrap',
+        marginBottom: '24px',
+        background: '#fff',
+        borderRadius: 16,
+        padding: '20px 24px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+        border: '1px solid #e7e5e4',
+      }}>
+        <div style={{ flex: '1 1 200px' }}>
+          <label style={labelStyle}>Branch</label>
           <select
-            className="form-select"
+            style={{ ...inputStyle, appearance: 'auto' }}
             value={selectedBranch}
             onChange={(e) => setSelectedBranch(e.target.value)}
           >
@@ -183,25 +222,42 @@ const AdminAnalyticsPage = () => {
             ))}
           </select>
         </div>
-        <div className="form-group">
-          <label>From</label>
+        <div style={{ flex: '1 1 160px' }}>
+          <label style={labelStyle}>From</label>
           <input
-            className="form-input"
+            style={inputStyle}
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
           />
         </div>
-        <div className="form-group">
-          <label>To</label>
+        <div style={{ flex: '1 1 160px' }}>
+          <label style={labelStyle}>To</label>
           <input
-            className="form-input"
+            style={inputStyle}
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
           />
         </div>
-        <button className="btn btn-primary" onClick={fetchAnalytics} disabled={loading}>
+        <button
+          onClick={fetchAnalytics}
+          disabled={loading}
+          style={{
+            padding: '10px 24px',
+            borderRadius: 10,
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            border: 'none',
+            background: '#6F4E37',
+            color: '#fff',
+            fontFamily: 'inherit',
+            opacity: loading ? 0.7 : 1,
+            transition: 'opacity 0.15s',
+            whiteSpace: 'nowrap',
+          }}
+        >
           {loading ? 'Loading...' : 'Generate Report'}
         </button>
       </div>
@@ -209,59 +265,118 @@ const AdminAnalyticsPage = () => {
       {analytics && (
         <>
           {/* Stat Cards */}
-          <div className="stats-grid">
-            <div className="admin-stat-card">
-              <span className="stat-icon">{'\uD83D\uDCC5'}</span>
-              <div className="stat-number">{analytics.totalReservations || 0}</div>
-              <div className="stat-label">Total Reservations</div>
-            </div>
-            <div className="admin-stat-card">
-              <span className="stat-icon">{'\u2705'}</span>
-              <div className="stat-number">{analytics.confirmedReservations || 0}</div>
-              <div className="stat-label">Confirmed</div>
-              <span className="stat-change stat-change-green">Confirmed</span>
-            </div>
-            <div className="admin-stat-card">
-              <span className="stat-icon">{'\u274C'}</span>
-              <div className="stat-number">{analytics.cancelledReservations || 0}</div>
-              <div className="stat-label">Cancelled</div>
-              <span className="stat-change stat-change-orange">Cancelled</span>
-            </div>
-            <div className="admin-stat-card">
-              <span className="stat-icon">{'\u2B50'}</span>
-              <div className="stat-number">
-                {analytics.averageRating != null
-                  ? Number(analytics.averageRating).toFixed(1)
-                  : '\u2014'}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '16px',
+            marginBottom: '24px',
+          }}>
+            {[
+              { icon: '\uD83D\uDCC5', value: analytics.totalReservations || 0, label: 'Total Reservations' },
+              { icon: '\u2705', value: analytics.confirmedReservations || 0, label: 'Confirmed', badge: 'Confirmed', badgeColor: '#16a34a', badgeBg: '#dcfce7' },
+              { icon: '\u274C', value: analytics.cancelledReservations || 0, label: 'Cancelled', badge: 'Cancelled', badgeColor: '#d97706', badgeBg: '#fef3c7' },
+              { icon: '\u2B50', value: analytics.averageRating != null ? Number(analytics.averageRating).toFixed(1) : '\u2014', label: 'Avg Rating' },
+            ].map((stat, i) => (
+              <div key={i} style={{
+                background: '#fff',
+                borderRadius: 16,
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                padding: '1.25rem 1.5rem',
+                textAlign: 'center',
+                border: '1px solid #e7e5e4',
+              }}>
+                <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{stat.icon}</div>
+                <div style={{ fontSize: '2rem', fontWeight: 700, color: '#1c1917' }}>{stat.value}</div>
+                <div style={{ fontSize: '0.85rem', color: '#78716c', marginTop: 4 }}>{stat.label}</div>
+                {stat.badge && (
+                  <span style={{
+                    display: 'inline-block',
+                    marginTop: 8,
+                    padding: '2px 10px',
+                    borderRadius: 9999,
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    color: stat.badgeColor,
+                    background: stat.badgeBg,
+                  }}>
+                    {stat.badge}
+                  </span>
+                )}
               </div>
-              <div className="stat-label">Avg Rating</div>
-            </div>
+            ))}
           </div>
 
           {/* Bar Chart */}
-          <div className="admin-chart-card">
-            <h3>Reservations Overview</h3>
+          <div style={{
+            background: '#fff',
+            borderRadius: 16,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+            padding: '1.5rem',
+            marginBottom: '24px',
+            border: '1px solid #e7e5e4',
+          }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1c1917', margin: '0 0 1rem' }}>
+              Reservations Overview
+            </h3>
             <Bar data={barData} options={barOptions} />
           </div>
 
           {/* Two Cards Row */}
-          <div className="admin-charts-row">
-            <div className="admin-chart-card">
-              <h3>Reservation Trends</h3>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '24px',
+          }}>
+            <div style={{
+              background: '#fff',
+              borderRadius: 16,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+              padding: '1.5rem',
+              border: '1px solid #e7e5e4',
+            }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1c1917', margin: '0 0 1rem' }}>
+                Reservation Trends
+              </h3>
               <Line data={lineData} options={lineOptions} />
             </div>
-            <div className="admin-chart-card">
-              <h3>Rating Distribution</h3>
+            <div style={{
+              background: '#fff',
+              borderRadius: 16,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+              padding: '1.5rem',
+              border: '1px solid #e7e5e4',
+            }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1c1917', margin: '0 0 1rem' }}>
+                Rating Distribution
+              </h3>
               {ratingDist.map((row) => (
-                <div className="rating-bar-row" key={row.stars}>
-                  <span className="rating-bar-label">{row.stars} stars</span>
-                  <div className="rating-bar-track">
-                    <div
-                      className="rating-bar-fill"
-                      style={{ width: `${row.pct}%` }}
-                    ></div>
+                <div key={row.stars} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  marginBottom: '10px',
+                }}>
+                  <span style={{ fontSize: '0.85rem', color: '#78716c', width: 60, flexShrink: 0 }}>
+                    {row.stars} stars
+                  </span>
+                  <div style={{
+                    flex: 1,
+                    height: 8,
+                    background: '#f5f5f4',
+                    borderRadius: 4,
+                    overflow: 'hidden',
+                  }}>
+                    <div style={{
+                      width: `${row.pct}%`,
+                      height: '100%',
+                      background: '#D4A574',
+                      borderRadius: 4,
+                      transition: 'width 0.3s',
+                    }} />
                   </div>
-                  <span className="rating-bar-pct">{row.pct}%</span>
+                  <span style={{ fontSize: '0.85rem', color: '#78716c', width: 40, textAlign: 'right', flexShrink: 0 }}>
+                    {row.pct}%
+                  </span>
                 </div>
               ))}
             </div>
@@ -270,8 +385,17 @@ const AdminAnalyticsPage = () => {
       )}
 
       {!analytics && !loading && (
-        <div className="empty-state">
-          <p>Select a branch and click "Generate Report" to view analytics.</p>
+        <div style={{
+          background: '#fff',
+          borderRadius: 16,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+          padding: '48px',
+          textAlign: 'center',
+          color: '#78716c',
+          fontSize: '15px',
+          border: '1px solid #e7e5e4',
+        }}>
+          Select a branch and click "Generate Report" to view analytics.
         </div>
       )}
     </AdminLayout>

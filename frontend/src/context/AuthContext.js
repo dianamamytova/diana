@@ -16,6 +16,9 @@ export const AuthProvider = ({ children }) => {
           setUser(response.data);
         } catch (error) {
           console.error('Failed to load user:', error);
+          if (error.response && error.response.status === 401) {
+            console.warn('Token expired or invalid, clearing auth state');
+          }
           localStorage.removeItem('token');
           setToken(null);
           setUser(null);

@@ -7,13 +7,15 @@ const StarRating = ({ rating }) => {
   const stars = [];
   for (let i = 1; i <= 5; i++) {
     stars.push(
-      <span key={i} className={i <= rating ? 'star-filled' : 'star-empty'}>
+      <span key={i} style={{ color: i <= rating ? '#F59E0B' : '#d6d3d1', fontSize: '1.1rem' }}>
         &#9733;
       </span>
     );
   }
-  return <span className="stars">{stars}</span>;
+  return <span style={{ display: 'inline-flex', gap: 2 }}>{stars}</span>;
 };
+
+const HERO_BG = 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80';
 
 const BranchPage = () => {
   const { branchId } = useParams();
@@ -41,16 +43,16 @@ const BranchPage = () => {
 
   if (loading) {
     return (
-      <div className="page-bg">
-        <div className="loading">Loading...</div>
+      <div style={{ minHeight: '100vh', background: '#FFF8F6', marginTop: 64 }}>
+        <div style={{ textAlign: 'center', padding: '4rem 0', color: '#78716c' }}>Loading...</div>
       </div>
     );
   }
 
   if (!branch) {
     return (
-      <div className="page-bg">
-        <div className="empty-state">
+      <div style={{ minHeight: '100vh', background: '#FFF8F6', marginTop: 64 }}>
+        <div style={{ textAlign: 'center', padding: '4rem 0', color: '#78716c' }}>
           <p>Branch not found.</p>
         </div>
       </div>
@@ -76,34 +78,68 @@ const BranchPage = () => {
   const features = ['WiFi', 'Pet-friendly', 'Open late'];
 
   return (
-    <div className="page-bg">
+    <div style={{ minHeight: '100vh', background: '#FFF8F6', marginTop: 64 }}>
       {/* Hero */}
-      <div className="branch-hero">
-        {branch.imageUrl ? (
-          <img src={branch.imageUrl} alt={branch.name} />
-        ) : (
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #2C1810, #6F4E37)' }} />
-        )}
-        <div className="branch-hero-overlay" />
-        <div className="branch-hero-text">
-          <h1>{branch.name}</h1>
-          <p>{branch.city}{branch.address ? ` \u2022 ${branch.address}` : ''}</p>
+      <div style={{
+        position: 'relative',
+        width: '100%',
+        height: 400,
+        overflow: 'hidden',
+      }}>
+        <img
+          src={branch.imageUrl || HERO_BG}
+          alt={branch.name}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        />
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 100%)',
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: '2.5rem 3rem',
+          color: '#fff',
+        }}>
+          <h1 style={{ fontSize: '2.75rem', fontWeight: 700, margin: '0 0 0.5rem', color: '#fff' }}>
+            {branch.name}
+          </h1>
+          <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.8)', margin: 0 }}>
+            {branch.city}{branch.address ? ` \u2022 ${branch.address}` : ''}
+          </p>
         </div>
       </div>
 
       {/* Branch Info */}
-      <div className="container">
-        <div className="section" style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto' }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 24px' }}>
+        <div style={{ textAlign: 'center', maxWidth: 700, margin: '0 auto', padding: '3rem 0 2rem' }}>
           {branch.description && (
-            <p className="section-subtitle" style={{ margin: '0 auto 1.5rem', maxWidth: '100%', textAlign: 'center' }}>
+            <p style={{
+              fontSize: '1.05rem',
+              color: '#57534e',
+              lineHeight: 1.7,
+              margin: '0 auto 1.5rem',
+              maxWidth: '100%',
+              textAlign: 'center',
+            }}>
               {branch.description}
             </p>
           )}
 
           {/* Features */}
-          <div className="features-row" style={{ justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center' }}>
             {features.map((f) => (
-              <span key={f} className="feature-badge">
+              <span key={f} style={{
+                background: '#FFF1EC',
+                color: '#6F4E37',
+                padding: '0.4rem 1rem',
+                borderRadius: 9999,
+                fontSize: '0.85rem',
+                fontWeight: 500,
+              }}>
                 {f}
               </span>
             ))}
@@ -111,25 +147,55 @@ const BranchPage = () => {
 
           {/* CTA Buttons */}
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem', flexWrap: 'wrap' }}>
-            <Link to="/reservation" className="btn btn-primary">
+            <Link to="/reservation" style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: '#6F4E37',
+              color: '#fff',
+              padding: '0.75rem 2rem',
+              borderRadius: 12,
+              fontSize: '0.95rem',
+              fontWeight: 600,
+              textDecoration: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background 0.2s',
+            }}>
               Reserve Your Spot
             </Link>
-            <Link to={`/menu/${branchId}`} className="btn-outline">
+            <Link to={`/menu/${branchId}`} style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'transparent',
+              color: '#6F4E37',
+              padding: '0.75rem 2rem',
+              borderRadius: 12,
+              fontSize: '0.95rem',
+              fontWeight: 600,
+              textDecoration: 'none',
+              border: '2px solid #6F4E37',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}>
               View Menu
             </Link>
           </div>
         </div>
 
         {/* Reviews Section */}
-        <div className="section">
+        <div style={{ padding: '2rem 0 3rem' }}>
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <h2 className="section-title">Guest Experiences</h2>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#1c1917', margin: '0 0 0.5rem' }}>
+              Guest Experiences
+            </h2>
             {averageRating && (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginTop: '0.75rem' }}>
-                <span style={{ fontSize: '2.5rem', fontWeight: '700', color: '#2C1810' }}>{averageRating}</span>
+                <span style={{ fontSize: '2.5rem', fontWeight: 700, color: '#2C1810' }}>{averageRating}</span>
                 <div>
                   <StarRating rating={Math.round(Number(averageRating))} />
-                  <p style={{ fontSize: '0.85rem', color: '#888', marginTop: '2px' }}>
+                  <p style={{ fontSize: '0.85rem', color: '#a8a29e', margin: '2px 0 0' }}>
                     {approvedReviews.length} review{approvedReviews.length !== 1 ? 's' : ''}
                   </p>
                 </div>
@@ -138,22 +204,46 @@ const BranchPage = () => {
           </div>
 
           {approvedReviews.length === 0 ? (
-            <div className="empty-state">
+            <div style={{ textAlign: 'center', padding: '3rem 0', color: '#78716c' }}>
               <p>No reviews yet for this branch.</p>
             </div>
           ) : (
             <>
-              <div className="card-grid-3">
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '1.5rem',
+              }}>
                 {approvedReviews.slice(0, 3).map((review) => (
-                  <div key={review.id} className="review-card">
-                    <div className="review-card-header">
-                      <div className="review-card-avatar">
+                  <div key={review.id} style={{
+                    background: '#fff',
+                    borderRadius: 24,
+                    padding: '1.5rem',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                    border: '1px solid #e7e5e4',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                      <div style={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #D4A574, #6F4E37)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#fff',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}>
                         {getInitials(review.userName)}
                       </div>
                       <div>
-                        <div className="review-author">{review.userName || 'Anonymous'}</div>
+                        <div style={{ fontWeight: 700, color: '#3D3028', fontSize: '0.95rem' }}>
+                          {review.userName || 'Anonymous'}
+                        </div>
                         {review.createdAt && (
-                          <div className="review-date">
+                          <div style={{ fontSize: '0.825rem', color: '#A89E95' }}>
                             {new Date(review.createdAt).toLocaleDateString()}
                           </div>
                         )}
@@ -163,18 +253,26 @@ const BranchPage = () => {
                       <StarRating rating={review.rating} />
                     </div>
                     {review.comment && (
-                      <div className="review-card-body">{review.comment}</div>
+                      <div style={{ fontSize: '0.9rem', color: '#57534e', lineHeight: 1.6 }}>
+                        {review.comment}
+                      </div>
                     )}
                   </div>
                 ))}
               </div>
-              {approvedReviews.length > 3 && (
-                <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-                  <Link to={`/review`} className="section-link" style={{ display: 'inline' }}>
-                    Read All Reviews
-                  </Link>
-                </div>
-              )}
+              <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+                <Link
+                  to={`/review?branch=${branchId}`}
+                  style={{
+                    color: '#6F4E37',
+                    fontWeight: 600,
+                    fontSize: '0.95rem',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  Leave a Review
+                </Link>
+              </div>
             </>
           )}
         </div>
