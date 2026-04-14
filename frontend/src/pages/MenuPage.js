@@ -3,14 +3,59 @@ import { useParams } from 'react-router-dom';
 import api from '../api/axios';
 import Footer from '../components/Footer';
 
+const ITEM_IMAGE_MAP = {
+  'Flat White': '/images/menu/flat-white.jpg',
+  'Cappuccino': '/images/menu/cappuccino.jpg',
+  'Americano': '/images/menu/americano.jpg',
+  'Iced Vanilla Latte': '/images/menu/iced-latte.jpg',
+  'Iced Latte': '/images/menu/iced-latte.jpg',
+  'Hazelnut Croissant': '/images/menu/croissant.jpg',
+  'Croissant': '/images/menu/croissant.jpg',
+  'Single Origin V60': '/images/menu/pour-over.jpg',
+  'V60 Pour Over': '/images/menu/pour-over.jpg',
+  'Artisan Avo Toast': '/images/menu/avo-toast.jpg',
+  'Avocado Toast': '/images/menu/avo-toast.jpg',
+  'Signature Cold Brew': '/images/menu/cold-brew.jpg',
+  'Cold Brew': '/images/menu/cold-brew.jpg',
+  'Matcha Latte': '/images/menu/matcha-latte.jpg',
+  'Mochi Set': '/images/menu/mochi.jpg',
+  'Tiramisu': '/images/menu/tiramisu.jpg',
+  'Cheesecake': '/images/menu/cheesecake.jpg',
+  'Macarons': '/images/menu/macarons.jpg',
+  'Brownie': '/images/menu/brownie.jpg',
+  'Pancakes': '/images/menu/pancakes.jpg',
+  'Burger': '/images/menu/burger.jpg',
+  'Pasta': '/images/menu/pasta.jpg',
+  'Bagel': '/images/menu/bagel.jpg',
+};
+
 const PLACEHOLDER_IMAGES = [
-  'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400&q=80',
-  'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80',
-  'https://images.unsplash.com/photo-1555507036-ab1f4038024a?w=400&q=80',
-  'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400&q=80',
-  'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80',
-  'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=400&q=80',
+  '/images/menu/flat-white.jpg',
+  '/images/menu/iced-latte.jpg',
+  '/images/menu/croissant.jpg',
+  '/images/menu/pour-over.jpg',
+  '/images/menu/avo-toast.jpg',
+  '/images/menu/cold-brew.jpg',
+  '/images/menu/matcha-latte.jpg',
+  '/images/menu/cappuccino.jpg',
 ];
+
+const API_BASE = api.defaults.baseURL || '';
+const resolveImg = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/api/')) return `${API_BASE}${url}`;
+  return url;
+};
+
+const getItemImage = (item, index) => {
+  if (item.imageUrl) return resolveImg(item.imageUrl);
+  if (ITEM_IMAGE_MAP[item.name]) return ITEM_IMAGE_MAP[item.name];
+  for (const key in ITEM_IMAGE_MAP) {
+    if (item.name?.toLowerCase().includes(key.toLowerCase())) return ITEM_IMAGE_MAP[key];
+  }
+  return PLACEHOLDER_IMAGES[index % PLACEHOLDER_IMAGES.length];
+};
 
 const MenuPage = () => {
   const { branchId } = useParams();
@@ -65,9 +110,7 @@ const MenuPage = () => {
     ? menuItems.filter((item) => Number(item.categoryId) === Number(activeCategory))
     : menuItems;
 
-  const getPlaceholderImage = (index) => {
-    return PLACEHOLDER_IMAGES[index % PLACEHOLDER_IMAGES.length];
-  };
+  const getPlaceholderImage = (index) => PLACEHOLDER_IMAGES[index % PLACEHOLDER_IMAGES.length];
 
   return (
     <div style={{
@@ -198,11 +241,15 @@ const MenuPage = () => {
                 overflow: 'hidden',
                 transition: 'transform 0.2s, box-shadow 0.2s',
               }}>
-                <div style={{ position: 'relative', width: '100%', height: 200, overflow: 'hidden' }}>
+                <div style={{
+                  position: 'relative', width: '100%', height: 200, overflow: 'hidden',
+                  background: 'linear-gradient(135deg, #6F4E37, #A0785A)',
+                }}>
                   <img
-                    src={item.imageUrl || getPlaceholderImage(index)}
-                    alt={item.name}
+                    src={getItemImage(item, index)}
+                    alt=""
                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    onError={(e) => { e.target.style.display = 'none'; }}
                   />
                   {item.discount > 0 && (
                     <span style={{

@@ -1,7 +1,112 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../api/axios';
 import { toast } from 'react-toastify';
 import AdminLayout from '../components/AdminLayout';
+
+const API_BASE = api.defaults.baseURL || '';
+
+const resolveImageSrc = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
+const ImageUploadField = ({ value, onChange }) => {
+  const [mode, setMode] = useState('upload');
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef(null);
+
+  const handleFile = async (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Please select an image file'); return; }
+    if (file.size > 10 * 1024 * 1024) { toast.error('Max 10 MB'); return; }
+    const fd = new FormData();
+    fd.append('file', file);
+    setUploading(true);
+    try {
+      const res = await api.post('/api/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      onChange(res.data.url);
+      toast.success('Image uploaded');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const previewSrc = resolveImageSrc(value);
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        <button type="button" onClick={() => setMode('upload')} style={{
+          padding: '6px 16px', borderRadius: 8, border: '1px solid',
+          borderColor: mode === 'upload' ? '#6F4E37' : '#d6d3d1',
+          background: mode === 'upload' ? '#6F4E37' : 'transparent',
+          color: mode === 'upload' ? '#fff' : '#57534e',
+          cursor: 'pointer', fontSize: 13, fontWeight: 500,
+        }}>Upload Image</button>
+        <button type="button" onClick={() => setMode('url')} style={{
+          padding: '6px 16px', borderRadius: 8, border: '1px solid',
+          borderColor: mode === 'url' ? '#6F4E37' : '#d6d3d1',
+          background: mode === 'url' ? '#6F4E37' : 'transparent',
+          color: mode === 'url' ? '#fff' : '#57534e',
+          cursor: 'pointer', fontSize: 13, fontWeight: 500,
+        }}>Paste URL</button>
+      </div>
+
+      {mode === 'upload' ? (
+        <>
+          <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }}
+            onChange={(e) => handleFile(e.target.files[0])} />
+          <div
+            onClick={() => !uploading && fileRef.current?.click()}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
+            style={{
+              border: `2px dashed ${dragOver ? '#6F4E37' : '#d6d3d1'}`,
+              borderRadius: 12, padding: 24, textAlign: 'center',
+              cursor: uploading ? 'wait' : 'pointer',
+              background: dragOver ? 'rgba(111,78,55,0.05)' : '#fafaf9',
+              transition: 'all 0.2s',
+            }}>
+            {uploading ? <div style={{ color: '#78716c' }}>Uploading...</div> : (
+              <>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>📷</div>
+                <div style={{ color: '#57534e', fontWeight: 500 }}>Click or drag to upload image</div>
+                <div style={{ color: '#a8a29e', fontSize: 12, marginTop: 4 }}>PNG, JPG, WEBP up to 10 MB</div>
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <input
+          type="text" value={value} onChange={(e) => onChange(e.target.value)}
+          placeholder="https://example.com/image.jpg"
+          style={{
+            width: '100%', padding: '0.6rem 0.8rem', borderRadius: 8,
+            border: '1px solid #e7e5e4', fontSize: '0.95rem', background: '#fafaf9',
+          }}
+        />
+      )}
+
+      {value && (
+        <div style={{ marginTop: 12, position: 'relative', display: 'inline-block' }}>
+          <img src={previewSrc} alt="Preview"
+            style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 12, border: '1px solid #e7e5e4' }}
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
+          <button type="button" onClick={() => onChange('')} style={{
+            position: 'absolute', top: -8, right: -8, width: 24, height: 24, borderRadius: '50%',
+            background: '#dc3545', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700,
+          }}>×</button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const emptyCategory = { name: '', description: '', branchId: '' };
 const emptyMenuItem = {
@@ -401,8 +506,8 @@ const AdminMenuPage = () => {
                           <td style={tdStyle}>
                             {item.imageUrl ? (
                               <img
-                                src={item.imageUrl}
-                                alt={item.name}
+                                src={resolveImageSrc(item.imageUrl)}
+                                alt=""
                                 style={{
                                   width: 48,
                                   height: 48,
@@ -410,6 +515,7 @@ const AdminMenuPage = () => {
                                   objectFit: 'cover',
                                   display: 'block',
                                 }}
+                                onError={(e) => { e.target.style.display = 'none'; }}
                               />
                             ) : (
                               <div style={{
@@ -702,12 +808,10 @@ const AdminMenuPage = () => {
                 </div>
               </div>
               <div style={{ marginBottom: '1.25rem' }}>
-                <label style={modalLabelStyle}>Image URL</label>
-                <input
-                  style={modalInputStyle}
-                  type="text"
+                <label style={modalLabelStyle}>Image</label>
+                <ImageUploadField
                   value={menuForm.imageUrl}
-                  onChange={(e) => setMenuForm({ ...menuForm, imageUrl: e.target.value })}
+                  onChange={(url) => setMenuForm({ ...menuForm, imageUrl: url })}
                 />
               </div>
               <div style={{ marginBottom: '1.25rem' }}>

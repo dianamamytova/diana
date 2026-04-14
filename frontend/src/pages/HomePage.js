@@ -7,6 +7,13 @@ const BRANCH_IMAGES = {
   'The Bean Haven': '/images/branch-sf.jpg',
   'Roast & Relic': '/images/branch-london.jpg',
   'Sip & Solace': '/images/branch-tokyo.jpg',
+  'Café Lumière': '/images/branch-paris.jpg',
+  'Bottega del Caffè': '/images/branch-rome.jpg',
+  'Gaudí Coffee House': '/images/branch-barcelona.jpg',
+  'Berliner Bohne': '/images/branch-berlin.jpg',
+  'Bosphorus Roastery': '/images/branch-istanbul.jpg',
+  'Ala-Too Coffee Lab': '/images/branch-bishkek.jpg',
+  'Desert Brew': '/images/branch-dubai.jpg',
 };
 
 const HomePage = () => {
@@ -84,11 +91,14 @@ const HomePage = () => {
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }}
                 >
-                  <div style={{ position: 'relative', height: 280 }}>
-                    {img ? (
-                      <img src={img} alt={branch.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #6F4E37, #A0785A)' }} />
+                  <div style={{ position: 'relative', height: 280, background: 'linear-gradient(135deg, #6F4E37, #A0785A)' }}>
+                    {(branch.imageUrl || img) && (
+                      <img
+                        src={branch.imageUrl || img}
+                        alt=""
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
                     )}
                     <span style={{
                       position: 'absolute', top: 16, left: 16,

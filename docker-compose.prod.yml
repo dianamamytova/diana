@@ -1,0 +1,59 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: coffeehub-db
+    restart: always
+    environment:
+      POSTGRES_DB: coffee_shop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: CoffeeHub2026Secure!
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: coffeehub-backend
+    restart: always
+    expose:
+      - "8081"
+    environment:
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/coffee_shop
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: CoffeeHub2026Secure!
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: Y29mZmVlaHViLXByb2R1Y3Rpb24tc2VjcmV0LWtleS0yMDI2LXZlcnktbG9uZy1hbmQtc2VjdXJl
+      APP_FRONTEND_URL: https://coffee-shop-diana.com
+      GOOGLE_CLIENT_ID: 46737466610-1ifi8rd9n0op6trfuulmn7ch0pv2b8eq.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: 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
+      JAVA_OPTS: -Xmx512m -Xms256m
+      APP_UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: coffeehub-frontend
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/www/certbot:/var/www/certbot
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  uploads_data:

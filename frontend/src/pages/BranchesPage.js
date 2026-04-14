@@ -3,7 +3,19 @@ import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import Footer from '../components/Footer';
 
-const BRANCH_PLACEHOLDER = 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80';
+const BRANCH_IMAGES = {
+  'The Bean Haven': '/images/branch-sf.jpg',
+  'Roast & Relic': '/images/branch-london.jpg',
+  'Sip & Solace': '/images/branch-tokyo.jpg',
+  'Café Lumière': '/images/branch-paris.jpg',
+  'Bottega del Caffè': '/images/branch-rome.jpg',
+  'Gaudí Coffee House': '/images/branch-barcelona.jpg',
+  'Berliner Bohne': '/images/branch-berlin.jpg',
+  'Bosphorus Roastery': '/images/branch-istanbul.jpg',
+  'Ala-Too Coffee Lab': '/images/branch-bishkek.jpg',
+  'Desert Brew': '/images/branch-dubai.jpg',
+};
+const BRANCH_PLACEHOLDER = '/images/branch-sf.jpg';
 
 const BranchesPage = () => {
   const [branches, setBranches] = useState([]);
@@ -59,16 +71,17 @@ const BranchesPage = () => {
                 border: '1px solid #e7e5e4',
               }}>
                 {/* Image */}
-                <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
+                <div style={{ position: 'relative', height: 200, overflow: 'hidden', background: 'linear-gradient(135deg, #6F4E37, #A0785A)' }}>
                   <img
-                    src={branch.imageUrl || BRANCH_PLACEHOLDER}
-                    alt={branch.name}
+                    src={branch.imageUrl || BRANCH_IMAGES[branch.name] || BRANCH_PLACEHOLDER}
+                    alt=""
                     style={{
                       width: '100%',
                       height: '100%',
                       objectFit: 'cover',
                       display: 'block',
                     }}
+                    onError={(e) => { e.target.style.display = 'none'; }}
                   />
                   <span style={{
                     position: 'absolute',
