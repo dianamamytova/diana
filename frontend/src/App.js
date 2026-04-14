@@ -23,6 +23,7 @@ const AdminReviewsPage = React.lazy(() => import('./pages/AdminReviewsPage'));
 const AdminAnalyticsPage = React.lazy(() => import('./pages/AdminAnalyticsPage'));
 const AdminQrPage = React.lazy(() => import('./pages/AdminQrPage'));
 const AdminBranchesPage = React.lazy(() => import('./pages/AdminBranchesPage'));
+const AdminSettingsPage = React.lazy(() => import('./pages/AdminSettingsPage'));
 const BranchPage = React.lazy(() => import('./pages/BranchPage'));
 const BranchesPage = React.lazy(() => import('./pages/BranchesPage'));
 const ReviewPage = React.lazy(() => import('./pages/ReviewPage'));
@@ -86,6 +87,9 @@ function AppContent() {
           } />
           <Route path="/admin/branches" element={
             <AdminRoute><AdminBranchesPage /></AdminRoute>
+          } />
+          <Route path="/admin/settings" element={
+            <AdminRoute><AdminSettingsPage /></AdminRoute>
           } />
 
           {/* 404 catch-all */}
